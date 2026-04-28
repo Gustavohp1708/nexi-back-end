@@ -22,9 +22,10 @@ public class AiAgentClient {
     @Value("${ai.agent.url:http://localhost:8000/chat}")
     private String aiAgentUrl;
 
-    public String ask(String question) {
+    public ChatResponseDTO ask(String question, String sessionId) {
         try {
-            String requestBody = objectMapper.writeValueAsString(Map.of("question", question));
+            String requestBody = objectMapper.writeValueAsString(
+                    Map.of("question", question, "session_id", sessionId));
 
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(aiAgentUrl))
@@ -38,8 +39,7 @@ public class AiAgentClient {
                 throw new IllegalStateException("AI agent returned status " + response.statusCode());
             }
 
-            ChatResponseDTO chatResponse = objectMapper.readValue(response.body(), ChatResponseDTO.class);
-            return chatResponse.answer();
+            return objectMapper.readValue(response.body(), ChatResponseDTO.class);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
             throw new IllegalStateException("Could not get a response from the AI agent.", exception);

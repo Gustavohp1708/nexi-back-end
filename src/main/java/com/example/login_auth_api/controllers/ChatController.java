@@ -19,14 +19,35 @@ import lombok.RequiredArgsConstructor;
 public class ChatController {
 
     private final AiAgentClient aiAgentClient;
+    private static final String DEFAULT_SESSION_ID = "anonymous-session";
 
     @PostMapping
     public ResponseEntity<ChatResponseDTO> chat(@RequestBody ChatRequestDTO body, Authentication authentication) {
-        String prompt = authentication == null
-                ? body.message()
-                : "Usuario autenticado: " + authentication.getName() + "\nPergunta: " + body.message();
+        String question = resolveQuestion(body);
+        String sessionId = resolveSessionId(body, authentication);
 
-        String answer = aiAgentClient.ask(prompt);
-        return ResponseEntity.ok(new ChatResponseDTO(answer));
+        String prompt = authentication == null
+                ? question
+                : "Usuario autenticado: " + authentication.getName() + "\nPergunta: " + question;
+
+        ChatResponseDTO response = aiAgentClient.ask(prompt, sessionId);
+        return ResponseEntity.ok(response);
+    }
+
+    private String resolveQuestion(ChatRequestDTO body) {
+        if (body.question() != null && !body.question().isBlank()) {
+            return body.question().trim();
+        }
+        return body.message() == null ? "" : body.message().trim();
+    }
+
+    private String resolveSessionId(ChatRequestDTO body, Authentication authentication) {
+        if (body.session_id() != null && !body.session_id().isBlank()) {
+            return body.session_id().trim();
+        }
+        if (authentication != null && authentication.getName() != null && !authentication.getName().isBlank()) {
+            return "user-" + authentication.getName().trim();
+        }
+        return DEFAULT_SESSION_ID;
     }
 }
