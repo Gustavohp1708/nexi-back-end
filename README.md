@@ -7,8 +7,11 @@ Seu principal objetivo é facilitar o acesso a informações internas da empresa
 ---
 
 ### Front-end construído com Angular 17 (https://github.com/Gustavohp1708/nexi-front-end)
-### Camada de IA: Pyhton + LangChain pring Boot.
+### Camada de IA: Pyhton + LangChain (https://github.com/Gustavohp1708/nexi-ia)
 
+---
+
+### Back-end Java 17 + Spring Boot
 API REST para registro e login de usuários, com configuração Spring Security, autenticação JWT e validação de credenciais com BCrypt.
 
 ## Arquitetura
